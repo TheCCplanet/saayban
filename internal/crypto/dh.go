@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-func GenerateDHKeyPair() (string, string, error) {
+func GenerateX25519KeyPair() (string, string, error) {
 	privateKey, err := ecdh.X25519().GenerateKey(rand.Reader)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to generate private key: %w", err)
