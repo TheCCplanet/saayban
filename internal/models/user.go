@@ -3,7 +3,6 @@ package models
 import (
 	"errors"
 	"strings"
-	"time"
 )
 
 var (
@@ -14,13 +13,13 @@ var (
 	ErrInvalidCredentials = errors.New("invalid credentials")
 )
 
-type User struct {
-	ID           int       `json:"id"`
-	Name         string    `json:"name"`
-	PasswordHash string    `json:"-"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
-}
+// type User struct {
+// 	ID           int       `json:"id"`
+// 	Name         string    `json:"name"`
+// 	PasswordHash string    `json:"-"`
+// 	CreatedAt    time.Time `json:"created_at"`
+// 	UpdatedAt    time.Time `json:"updated_at"`
+// }
 
 type ErrorResponse struct {
 	Error string `json:"error"`
