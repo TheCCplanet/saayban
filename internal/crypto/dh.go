@@ -5,17 +5,22 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"sayban/internal/models"
 )
 
-func GenerateX25519KeyPair() (string, string, error) {
+func GenerateX25519KeyPair() (*models.X25519KeyPair, error) {
 	curve := ecdh.X25519()
+
+	var keyPair models.X25519KeyPair
 
 	privateKey, err := curve.GenerateKey(rand.Reader)
 	if err != nil {
-		return "", "", fmt.Errorf("failed to generate private key: %w", err)
+		return nil, fmt.Errorf("failed to generate private key: %w", err)
 	}
 	publicKey := privateKey.PublicKey()
-	return base64.StdEncoding.EncodeToString(publicKey.Bytes()), base64.StdEncoding.EncodeToString(privateKey.Bytes()), nil
+	keyPair.Private = base64.StdEncoding.EncodeToString(privateKey.Bytes())
+	keyPair.Public = base64.StdEncoding.EncodeToString(publicKey.Bytes())
+	return &keyPair, nil
 }
 
 func GenerateX25519SharedKey(publicKey string, privateKey string) (string, error) {
@@ -38,7 +43,7 @@ func GenerateX25519SharedKey(publicKey string, privateKey string) (string, error
 
 	pubKey, err := curve.NewPublicKey(publicKeyBytes)
 	if err != nil {
-		return "", fmt.Errorf("failed to import private key: %w", err)
+		return "", fmt.Errorf("failed to import public key: %w", err)
 	}
 
 	sharedKey, err := privKey.ECDH(pubKey)

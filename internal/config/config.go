@@ -21,7 +21,7 @@ func Load() *Config {
 	}
 }
 func getDurationEnv(key string, fallback time.Duration) time.Duration {
-	if value := os.Getenv("key"); value != "" {
+	if value := os.Getenv(key); value != "" {
 		if duration, err := time.ParseDuration(value); err == nil {
 			return duration
 		}

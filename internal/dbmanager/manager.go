@@ -51,8 +51,9 @@ func (m *Manager) Close() {
 	m.Mu.Lock()
 	defer m.Mu.Unlock()
 
-	m.DB.Close()
-	m.DB = nil
+	if m.DB != nil {
+		m.DB.Close()
+		m.DB = nil
+	}
 	m.IsLocked = true
-
 }

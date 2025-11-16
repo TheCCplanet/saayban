@@ -10,31 +10,6 @@ import (
 	"time"
 )
 
-func (m *Manager) Create(cfg *config.Config, name string, password string) error {
-	err := os.MkdirAll(cfg.DBUrl, 0700)
-	if err != nil {
-		return fmt.Errorf("faild to init database: %e", err)
-	}
-
-	dbPath := filepath.Join(cfg.DBUrl, name+".db")
-
-	_, err = os.Stat(dbPath)
-	if err == nil {
-		return fmt.Errorf("database is already exists for user %s", name)
-	}
-	db, err := sql.Open("sqlite3", fmt.Sprintf("%s?_key=%s", dbPath, password))
-	if err != nil {
-		return fmt.Errorf("database error: %w", err)
-	}
-	defer db.Close()
-
-	if _, err := db.Exec("CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY, content TEXT);"); err != nil {
-		return fmt.Errorf("failed to init schema: %w", err)
-	}
-
-	return nil
-}
-
 func (m *Manager) StartAutoLockTimer() {
 	if m.Timer != nil {
 		m.Timer.Stop()
@@ -46,7 +21,7 @@ func (m *Manager) StartAutoLockTimer() {
 
 func (m *Manager) Unlock(cfg *config.Config, name string, password string) error {
 	if !m.IsLocked {
-		return fmt.Errorf("database is alredy unlocked")
+		return fmt.Errorf("database is already unlocked")
 	}
 
 	m.Mu.Lock()
@@ -56,11 +31,11 @@ func (m *Manager) Unlock(cfg *config.Config, name string, password string) error
 
 	_, err := os.Stat(dbPath)
 	if err != nil {
-		return fmt.Errorf("database is not exists for user %s", name)
+		return fmt.Errorf("database does not exist for user %s", name)
 	}
 
 	db, err := sql.Open("sqlite3", fmt.Sprintf("%s?_key=%s", dbPath, password))
-	if err != err {
+	if err != nil {
 		return err
 	}
 	err = db.Ping()

@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 	"strings"
+	"time"
 )
 
 var (
@@ -70,10 +71,11 @@ func (u *LockRequest) Validate() error {
 	return nil
 }
 
-// type Account struct {
-// 	ID          string
-// 	Onion       string
-// 	IdentityKey string
-// 	CreatedAt   time.Time
-// 	UpdateAt    time.Time
-// }
+type Account struct {
+	ID           string
+	Name         string
+	OnionAddress string
+	IdentityKey  string
+	CreatedAt    time.Time
+	UpdateAt     time.Time
+}

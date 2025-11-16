@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 
 	"golang.org/x/crypto/hkdf"
-	_ "golang.org/x/crypto/hkdf"
 )
 
 func DeriveRootKey(sharedSecret [32]byte) ([32]byte, error) {

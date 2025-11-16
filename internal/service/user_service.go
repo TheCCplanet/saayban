@@ -1,10 +1,10 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 	"sayban/internal/config"
 	"sayban/internal/dbmanager"
+	"sayban/internal/models"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -19,15 +19,15 @@ func NewUserService() *UserService {
 	}
 }
 
-func (s *UserService) Register(cfg *config.Config, name string, password string) error {
+func (s *UserService) Register(cfg *config.Config, userName string, password string) error {
 
-	_, exists := s.users[name]
+	_, exists := s.users[userName]
 	if exists {
 		return fmt.Errorf("user is already registered")
 	}
 	m := dbmanager.NewManger(cfg)
-	s.users[name] = m
-	err := m.Create(cfg, name, password)
+	s.users[userName] = m
+	err := m.Create(cfg, userName, password)
 	if err != nil {
 		return err
 	}
@@ -35,20 +35,20 @@ func (s *UserService) Register(cfg *config.Config, name string, password string)
 	return nil
 }
 
-func (s *UserService) Lock(name string) error {
-	m, exists := s.users[name]
+func (s *UserService) Lock(userName string) error {
+	m, exists := s.users[userName]
 	if !exists {
-		return errors.New("nothing found")
+		return fmt.Errorf("there's no db userNamed %s", userName)
 	}
 
 	return m.Lock()
 }
-func (s *UserService) Unlock(cfg *config.Config, name string, passwrod string) error {
-	m, exists := s.users[name]
+func (s *UserService) Unlock(cfg *config.Config, userName string, password string) error {
+	m, exists := s.users[userName]
 	if !exists {
-		return fmt.Errorf("their's no db named %s", name)
+		return fmt.Errorf("there's no db userNamed %s", userName)
 	}
-	err := m.Unlock(cfg, name, passwrod)
+	err := m.Unlock(cfg, userName, password)
 	if err != nil {
 		return err
 	}
@@ -56,10 +56,36 @@ func (s *UserService) Unlock(cfg *config.Config, name string, passwrod string) e
 	return nil
 }
 
-// func (s *UserService) GetDB(name string) (*dbmanager.Manager, error) {
-// 	m, exists := s.users[name]
-// 	if !exists {
-// 		return nil, errors.New("nothing found")
-// 	}
-// 	return m, nil
+// func (s *UserService) SendKeyBundle() error {
+
+// 	return nil
 // }
+
+func (s *UserService) DeleteAccountByID(userName string, onionAddress string) error {
+	m, exists := s.users[userName]
+	if !exists {
+		return fmt.Errorf("their's no db userNamed %s", userName)
+	}
+	err := m.DeleteAccountByAddress(onionAddress)
+	return err
+}
+
+func (s *UserService) RegisterAccount(userName string, account models.Account) error {
+	m, exists := s.users[userName]
+	if !exists {
+		return fmt.Errorf("their's no db userNamed %s", userName)
+	}
+	err := m.AddAccount(account)
+
+	return err
+}
+
+func (s *UserService) GetAccountList(userName string) ([]*models.Account, error) {
+	m, exists := s.users[userName]
+	if !exists {
+		return nil, fmt.Errorf("their's no db userNamed %s", userName)
+	}
+	accounts, err := m.GetAccountList()
+
+	return accounts, err
+}
